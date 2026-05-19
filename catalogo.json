@@ -1,0 +1,11 @@
+[
+  {
+    "id": "portal",
+    "nombre": "Portal UNELLEZ",
+    "desc": "Sistema de gestión académica y accesos rápidos de la UNELLEZ.",
+    "icono": "💻",
+    "color1": "#009cf5",
+    "color2": "#1d0cd1",
+    "paquete": "portal-unellez-saborunellez"
+  }
+]
