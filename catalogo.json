@@ -3,7 +3,7 @@
     "id": "info",
     "nombre": "Portal UNELLEZ",
     "desc": "Gestión académica y administrativa centralizada. (Instalará SuperTux para pruebas)",
-    "icono": "💻",
+    "icono": "https://raw.githubusercontent.com/GUSBWorks/unellez-store-saborunellez/main/logos/unellez-logo.png",
     "color1": "#009cf5",
     "color2": "#1d0cd1",
     "paquete": "supertux"
@@ -12,7 +12,7 @@
     "id": "mate",
     "nombre": "Mate UNELLEZ",
     "desc": "Herramientas de cálculo simbólico y visualización. (Instalará una calculadora para pruebas)",
-    "icono": "🧮",
+    "icono": "https://raw.githubusercontent.com/GUSBWorks/unellez-store-saborunellez/main/logos/unellez-logo-dorado.png",
     "color1": "#f5c421",
     "color2": "#f58d07",
     "paquete": "galculator"
@@ -21,7 +21,7 @@
     "id": "ofi",
     "nombre": "Ofimática Unellez",
     "desc": "Suite completa para edición de documentos y reportes. (Instalará un bloc de notas para pruebas)",
-    "icono": "📄",
+    "icono": "https://raw.githubusercontent.com/GUSBWorks/unellez-store-saborunellez/main/logos/Tux.png",
     "color1": "#f58d07",
     "color2": "#f55900",
     "paquete": "mousepad"
