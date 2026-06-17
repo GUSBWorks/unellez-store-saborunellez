@@ -1,7 +1,8 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+// Añadimos 'async' para no bloquear la interfaz gráfica de Vue
 #[tauri::command]
-fn instalar_paquete(enlace: String) -> Result<String, String> {
+async fn instalar_paquete(enlace: String) -> Result<String, String> {
     println!("Descargando e instalando desde: {}", enlace);
     let ruta_temp = "/tmp/instalador_unellez.deb";
 
@@ -16,8 +17,13 @@ fn instalar_paquete(enlace: String) -> Result<String, String> {
         return Err("Error al descargar el archivo desde GitHub".to_string());
     }
 
-    let comando_instalacion = format!("dpkg -i {} ; apt-get install -f -y", ruta_temp);
+    // Inyectamos DEBIAN_FRONTEND=noninteractive para hacer la instalación 100% desatendida
+    let comando_instalacion = format!(
+        "export DEBIAN_FRONTEND=noninteractive; dpkg -i {} ; apt-get install -f -y", 
+        ruta_temp
+    );
     
+    // pkexec llamará a la ventana gráfica para pedir la contraseña
     let salida = std::process::Command::new("pkexec")
         .arg("sh")
         .arg("-c")
@@ -36,32 +42,36 @@ fn instalar_paquete(enlace: String) -> Result<String, String> {
                 Err("Error en la instalación. Revisa la terminal.".to_string())
             }
         }
-        Err(_) => Err("Fallo al contactar con el sistema".to_string()),
+        Err(_) => Err("Fallo al contactar con el sistema Polkit".to_string()),
     }
 }
 
-
 // --- FUNCIÓN PARA DESINSTALAR ---
 #[tauri::command]
-fn desinstalar_paquete(paquete: String) -> Result<String, String> {
+async fn desinstalar_paquete(paquete: String) -> Result<String, String> {
     println!("Vue pidió desinstalar: {}", paquete);
     
+    // Aplicamos la instalación desatendida
+    let comando_desinstalacion = format!(
+        "export DEBIAN_FRONTEND=noninteractive; apt-get remove -y {}", 
+        paquete
+    );
+
     let salida = std::process::Command::new("pkexec")
-        .arg("apt-get")
-        .arg("remove")
-        .arg("-y")
-        .arg(&paquete)
+        .arg("sh")
+        .arg("-c")
+        .arg(&comando_desinstalacion)
         .output();
 
     match salida {
         Ok(res) => if res.status.success() { Ok(format!("{} eliminado", paquete)) } else { Err("Error al desinstalar".to_string()) },
-        Err(_) => Err("Fallo del sistema".to_string()),
+        Err(_) => Err("Fallo del sistema Polkit".to_string()),
     }
 }
 
 // --- FUNCIÓN PARA ACTUALIZAR CATÁLOGO ---
 #[tauri::command]
-fn actualizar_sistema() -> Result<String, String> {
+async fn actualizar_sistema() -> Result<String, String> {
     println!("Actualizando lista de repositorios...");
     
     let salida = std::process::Command::new("pkexec")
@@ -71,13 +81,12 @@ fn actualizar_sistema() -> Result<String, String> {
 
     match salida {
         Ok(res) => if res.status.success() { Ok("Catálogo actualizado".to_string()) } else { Err("Error en update".to_string()) },
-        Err(_) => Err("Fallo del sistema".to_string()),
+        Err(_) => Err("Fallo del sistema Polkit".to_string()),
     }
 }
 
 fn main() {
     tauri::Builder::default()
-        
         .invoke_handler(tauri::generate_handler![instalar_paquete, desinstalar_paquete, actualizar_sistema])
         .run(tauri::generate_context!())
         .expect("Ocurrió un error al iniciar la tienda");
